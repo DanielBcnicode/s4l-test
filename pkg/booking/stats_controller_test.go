@@ -14,39 +14,94 @@ import (
 func TestStatsController(t *testing.T) {
 	service := StatsController()
 
-	req, err := http.NewRequest("POST", "/stats", strings.NewReader(`[
+	type args struct {
+		payload string
+	}
+	tests := []struct {
+		name string
+		args args
+		want StatsResponse
+	} {
 		{
-			"request_id":"bookata_XY123",
-			"check_in":"2020-01-01",
-			"nights":5,
-			"selling_rate":200,
-			"margin":20
+			name: "two bookings",
+			args: args{
+				payload: `[
+					{
+						"request_id":"bookata_XY123",
+						"check_in":"2020-01-01",
+						"nights":5,
+						"selling_rate":200,
+						"margin":20
+					},
+					{
+						"request_id":"kayete_PP234",
+						"check_in":"2020-01-04",
+						"nights":4,
+						"selling_rate":156,
+						"margin":22
+					}
+				]`,
+			},
+			want: StatsResponse{
+				AverageNight: 8.29,
+				MaxNight: 8.58,
+				MinNight: 8,
+			},
 		},
 		{
-			"request_id":"kayete_PP234",
-			"check_in":"2020-01-04",
-			"nights":4,
-			"selling_rate":156,
-			"margin":22
-		}
-	]`))
-
-	if err != nil {
-		t.Fatal(err)
+			name: "three bookings",
+			args: args{
+				payload: `[
+					{
+						"request_id":"bookata_XY123",
+						"check_in":"2020-01-01",
+						"nights":1,
+						"selling_rate":50,
+						"margin":20
+					},
+					{
+						"request_id":"kayete_PP234",
+						"check_in":"2020-01-04",
+						"nights":1,
+						"selling_rate":55,
+						"margin":22
+					},
+					{
+						"request_id":"trivoltio_ZX69",
+						"check_in":"2020-01-07",
+						"nights":1,
+						"selling_rate":49,
+						"margin":21
+					}
+				]`,
+			},
+			want: StatsResponse{
+				AverageNight: 10.80,
+				MaxNight: 12.1,
+				MinNight: 10,
+			},
+		},
 	}
 
-	recorder := httptest.NewRecorder()
-	handle := http.HandlerFunc(service)
-	handle.ServeHTTP(recorder, req)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req, err := http.NewRequest("POST", "/stats", strings.NewReader(tt.args.payload))
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	res := recorder.Result()
-	resBody, _ := io.ReadAll(res.Body)
+			recorder := httptest.NewRecorder()
+			handle := http.HandlerFunc(service)
+			handle.ServeHTTP(recorder, req)
 
-	got := StatsResponse{}
-	_ = json.Unmarshal(resBody, &got)
+			res := recorder.Result()
+			resBody, _ := io.ReadAll(res.Body)
 
-	assert.Equal(t, float32(8.29), got.AverageNight)
-	assert.Equal(t, float32(8), got.MinNight)
-	assert.Equal(t, float32(8.58), got.MaxNight)
+			got := StatsResponse{}
+			_ = json.Unmarshal(resBody, &got)
+
+			assert.Equal(t, tt.want, got)
+		})
+	}
 
 }
