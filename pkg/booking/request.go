@@ -1,10 +1,16 @@
 package booking
 
 import (
+	"errors"
 	"time"
 
 	"github.com/danielbcnicode/timeslot/internal"
 )
+
+var (
+	ErrorNightsCanBeZero = errors.New("Nights can not be zero")
+	ErrorSellingRateCanBeZero = errors.New("SellingRate can not be zero")
+) 
 
 type RequestAPI struct {
 	RequestID   string `json:"request_id"`
@@ -27,12 +33,21 @@ func RequestFromRequestAPI(req RequestAPI) (Request, error) {
 	if err != nil {
 		return Request{}, err
 	}
+
+	if req.Nights == 0 {
+		return Request{}, ErrorNightsCanBeZero
+	}
+    
+	if req.SellingRate == 0 {
+		return Request{}, ErrorSellingRateCanBeZero
+	}
+
 	d := internal.NewDaySlot(t, t.Add(24*time.Hour*time.Duration(req.Nights)))
 	return Request{
 		req.RequestID,
 		req.SellingRate,
 		req.Margin,
-		float32(req.SellingRate) * float32(req.Margin/100) / float32(req.Nights),
+		float32(req.SellingRate) * (float32(req.Margin) / float32(100)) / float32(req.Nights),
 		d,
 	}, nil
 }

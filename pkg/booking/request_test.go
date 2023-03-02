@@ -3,6 +3,7 @@ package booking
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRequstSerialization(t *testing.T) {
+func TestRequstAPISerialization(t *testing.T) {
 	serialized := `[
 		{ 
 			"request_id":"bookata_XY123", 
@@ -57,9 +58,97 @@ func TestRequstSerialization(t *testing.T) {
 
 }
 
-func TestRequst(t *testing.T) {
-	b := internal.NewDaySlot(time.Now(), time.Now().Add(24 * time.Hour))
-	a := Request{}
 
-	assert.Equal(t, a.Duration(), 1)
+func TestRequestFromRequestAPI(t *testing.T) {
+	type args struct {
+		req RequestAPI
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    Request
+		wantErr bool
+	}{
+		{
+			name: "Happy path in constructor",
+			args: args{
+				req: RequestAPI{
+					RequestID: "id-test",
+					CheckIn: "2022-02-01",
+					Nights: 5,
+					SellingRate: 200,
+					Margin: 20,
+				},
+			},
+			want: Request{
+				"id-test",
+				200,
+				20,
+				float32(200) * (float32(20)/float32(100)) / float32(5),
+				internal.NewDaySlot(
+					time.Date(2022, time.Month(2), 1,12,0,0,0,time.UTC),
+					time.Date(2022, time.Month(2), 6,12,0,0,0,time.UTC),
+				),
+			},
+			wantErr: false,
+
+		},
+		{
+			name: "error when data is wrong",
+			args: args{
+				req: RequestAPI{
+					RequestID: "id-test",
+					CheckIn: "20sd-02-01",
+					Nights: 5,
+					SellingRate: 200,
+					Margin: 20,
+				},
+			},
+			want: Request{},
+			wantErr: true,
+
+		},
+		{
+			name: "error when Nights is zero",
+			args: args{
+				req: RequestAPI{
+					RequestID: "id-test",
+					CheckIn: "2022-02-01",
+					Nights: 0,
+					SellingRate: 200,
+					Margin: 20,
+				},
+			},
+			want: Request{},
+			wantErr: true,
+
+		},
+		{
+			name: "error when SellingRate is zero",
+			args: args{
+				req: RequestAPI{
+					RequestID: "id-test",
+					CheckIn: "2022-02-01",
+					Nights: 23,
+					SellingRate: 0,
+					Margin: 20,
+				},
+			},
+			want: Request{},
+			wantErr: true,
+
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := RequestFromRequestAPI(tt.args.req)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("RequestFromRequestAPI() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("RequestFromRequestAPI() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
