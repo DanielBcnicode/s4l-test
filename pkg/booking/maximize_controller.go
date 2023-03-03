@@ -2,22 +2,16 @@ package booking
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 )
 
-// This file has the API stats controller
+// This file has the API maximize controller
 // It gets the payload and deserialize it in the proper struct
-// The service to calculate the averages is injected in the constructor
 
-var (
-	TotalDaysCanBeZero = errors.New("total days can't be zero")
-)
-
-func StatsController(
+func MaximizeController(
 	extractor PayloadExtractor,
-	calculator StatsServiceCalculator,
+	maximizer Maximizer,
 ) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		bookings, err := extractor.ExtractPayload(w, r)
@@ -25,7 +19,7 @@ func StatsController(
 			return
 		}
 
-		retData, err := calculator.Calculate(bookings)
+		retData, err := maximizer.Maximize(bookings)
 		if err != nil {
 			log.Printf("ERROR: %s\n", err)
 			w.WriteHeader(http.StatusBadRequest)

@@ -12,7 +12,7 @@ import (
 )
 
 func TestStatsController(t *testing.T) {
-	service := StatsController()
+	service := StatsController(NewPayloadExtract(), NewStatsCalculator())
 
 	type args struct {
 		payload string
@@ -21,7 +21,7 @@ func TestStatsController(t *testing.T) {
 		name string
 		args args
 		want StatsResponse
-	} {
+	}{
 		{
 			name: "two bookings",
 			args: args{
@@ -44,8 +44,8 @@ func TestStatsController(t *testing.T) {
 			},
 			want: StatsResponse{
 				AverageNight: 8.29,
-				MaxNight: 8.58,
-				MinNight: 8,
+				MaxNight:     8.58,
+				MinNight:     8,
 			},
 		},
 		{
@@ -77,8 +77,8 @@ func TestStatsController(t *testing.T) {
 			},
 			want: StatsResponse{
 				AverageNight: 10.80,
-				MaxNight: 12.1,
-				MinNight: 10,
+				MaxNight:     12.1,
+				MinNight:     10,
 			},
 		},
 	}
@@ -103,5 +103,4 @@ func TestStatsController(t *testing.T) {
 			assert.Equal(t, tt.want, got)
 		})
 	}
-
 }
