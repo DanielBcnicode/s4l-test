@@ -14,8 +14,10 @@ func MaximizeController(
 	maximizer Maximizer,
 ) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		bookings, err := extractor.ExtractPayload(w, r)
+		bookings, err := extractor.ExtractPayload(r)
 		if err != nil {
+			log.Printf("ERROR: %s\n", err)
+			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
