@@ -9,10 +9,12 @@ const (
 )
 
 type Node struct {
-	children  []*Node
-	father    *Node
-	kind      NodeType
-	innerData interface{}
+	children       []*Node
+	father         *Node
+	kind           NodeType
+	profitPerNight float32
+	profit         float32
+	innerData      interface{}
 }
 
 func NewNode(father *Node) *Node {
@@ -70,6 +72,26 @@ func (n *Node) NodeCount() int {
 	}
 
 	return nn
+}
+
+func (n *Node) ProfitPerNight() float32 {
+	return n.profitPerNight
+}
+
+func (n *Node) SetProfitPerNight(profit float32) {
+	n.profitPerNight = profit
+}
+
+func (n *Node) Profit() float32 {
+	return n.profit
+}
+
+func (n *Node) SetProfit(profit float32) {
+	n.profit = profit
+}
+
+func (n *Node) Father() *Node {
+	return n.father
 }
 
 func (n *Node) GetLeafs() []*Node {

@@ -39,7 +39,7 @@ func (s *DaySlot) Duration() int {
 // Overlaps return true if the time windows between slot and other overlaps
 // op1 -------->                1a###############1b
 // op2 -------->            2a#########2b
-func (s *DaySlot) Overlaps(other DaySlot) bool {
+func (s *DaySlot) Overlaps(other *DaySlot) bool {
 	op1a := s.inSlot.UnixNano()
 	op1b := s.outSlot.UnixNano()
 	op2a := other.inSlot.UnixNano()
@@ -61,6 +61,12 @@ func (s *DaySlot) Overlaps(other DaySlot) bool {
 	return false
 }
 
+// StartDate returns the slot initial time
 func (s *DaySlot) StartDate() time.Time {
 	return s.inSlot
+}
+
+// EndDate returns the slot end time
+func (s *DaySlot) EndDate() time.Time {
+	return s.outSlot
 }

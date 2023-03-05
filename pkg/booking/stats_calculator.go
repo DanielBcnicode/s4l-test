@@ -19,17 +19,17 @@ func (s *StatsCalculator) Calculate(bookings []Request) (StatsResponse, error) {
 
 	for i, r := range bookings {
 		if i == 0 {
-			min = r.Profit
-			max = r.Profit
+			min = r.ProfitPerNight
+			max = r.ProfitPerNight
 		}
 
-		if r.Profit > max {
-			max = r.Profit
+		if r.ProfitPerNight > max {
+			max = r.ProfitPerNight
 		}
-		if r.Profit < min {
-			min = r.Profit
+		if r.ProfitPerNight < min {
+			min = r.ProfitPerNight
 		}
-		total += r.Profit
+		total += r.ProfitPerNight
 		totalBookings += 1
 
 	}

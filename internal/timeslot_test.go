@@ -181,7 +181,7 @@ func TestDaySlot_Overlaps(t *testing.T) {
 				inSlot:  tt.fields.inSlot,
 				outSlot: tt.fields.outSlot,
 			}
-			if got := slot.Overlaps(tt.args.other); got != tt.want {
+			if got := slot.Overlaps(&tt.args.other); got != tt.want {
 				t.Errorf("DaySlot.Overlaps() = %v, want %v", got, tt.want)
 			}
 		})

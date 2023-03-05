@@ -23,6 +23,8 @@ func TestNewNode(t *testing.T) {
 	n2a2.SetData("data test")
 	n3b1 := NewNode(n2a2)
 	n3b2 := NewNode(nil)
+	n3b2.SetProfit(23.3)
+	n3b2.SetProfitPerNight(15.3)
 	n2a2.AddChildren(n3b2)
 	leafs := []*Node{n1b, n2a1, n3b1, n3b2}
 
@@ -50,4 +52,8 @@ func TestNewNode(t *testing.T) {
 	// Data test
 	assert.Equal(t, "data test", n2a2.Data())
 	assert.Equal(t, 3.12, n1b.Data())
+
+	// Profit test
+	assert.Equal(t, float32(15.3), n3b2.ProfitPerNight())
+	assert.Equal(t, float32(23.3), n3b2.Profit())
 }

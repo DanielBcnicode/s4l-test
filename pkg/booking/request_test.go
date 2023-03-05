@@ -58,7 +58,6 @@ func TestRequstAPISerialization(t *testing.T) {
 
 }
 
-
 func TestRequestFromRequestAPI(t *testing.T) {
 	type args struct {
 		req RequestAPI
@@ -73,70 +72,67 @@ func TestRequestFromRequestAPI(t *testing.T) {
 			name: "Happy path in constructor",
 			args: args{
 				req: RequestAPI{
-					RequestID: "id-test",
-					CheckIn: "2022-02-01",
-					Nights: 5,
+					RequestID:   "id-test",
+					CheckIn:     "2022-02-01",
+					Nights:      5,
 					SellingRate: 200,
-					Margin: 20,
+					Margin:      20,
 				},
 			},
 			want: Request{
 				"id-test",
 				200,
 				20,
-				float32(200) * (float32(20)/float32(100)) / float32(5),
+				float32(200) * (float32(20) / float32(100)) / float32(5),
+				float32(200) * (float32(20) / float32(100)),
 				internal.NewDaySlot(
-					time.Date(2022, time.Month(2), 1,12,0,0,0,time.UTC),
-					time.Date(2022, time.Month(2), 6,12,0,0,0,time.UTC),
+					time.Date(2022, time.Month(2), 1, 12, 0, 0, 0, time.UTC),
+					time.Date(2022, time.Month(2), 6, 12, 0, 0, 0, time.UTC),
 				),
 			},
 			wantErr: false,
-
 		},
 		{
 			name: "error when data is wrong",
 			args: args{
 				req: RequestAPI{
-					RequestID: "id-test",
-					CheckIn: "20sd-02-01",
-					Nights: 5,
+					RequestID:   "id-test",
+					CheckIn:     "20sd-02-01",
+					Nights:      5,
 					SellingRate: 200,
-					Margin: 20,
+					Margin:      20,
 				},
 			},
-			want: Request{},
+			want:    Request{},
 			wantErr: true,
-
 		},
 		{
 			name: "error when Nights is zero",
 			args: args{
 				req: RequestAPI{
-					RequestID: "id-test",
-					CheckIn: "2022-02-01",
-					Nights: 0,
+					RequestID:   "id-test",
+					CheckIn:     "2022-02-01",
+					Nights:      0,
 					SellingRate: 200,
-					Margin: 20,
+					Margin:      20,
 				},
 			},
-			want: Request{},
+			want:    Request{},
 			wantErr: true,
-
 		},
 		{
 			name: "error when SellingRate is zero",
 			args: args{
 				req: RequestAPI{
-					RequestID: "id-test",
-					CheckIn: "2022-02-01",
-					Nights: 23,
+					RequestID:   "id-test",
+					CheckIn:     "2022-02-01",
+					Nights:      23,
 					SellingRate: 0,
-					Margin: 20,
+					Margin:      20,
 				},
 			},
-			want: Request{},
+			want:    Request{},
 			wantErr: true,
-
 		},
 	}
 	for _, tt := range tests {
