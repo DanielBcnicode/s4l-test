@@ -2,6 +2,7 @@ package internal
 
 import "time"
 
+// DaySlot is the time structure to represent a windows-time
 type DaySlot struct {
 	inSlot  time.Time
 	outSlot time.Time
@@ -29,7 +30,7 @@ func NewDaySlot(inSlot time.Time, outSlot time.Time) DaySlot {
 	return DaySlot{inSlot: in, outSlot: out}
 }
 
-// Duration represents the duration of the slot in whole days, the value returned is an integer
+// Duration represents the duration of the slot in days, the value returned is an integer
 func (s *DaySlot) Duration() int {
 
 	return int(s.outSlot.Sub(s.inSlot).Hours() / 24)

@@ -1,0 +1,23 @@
+services:
+  booking:
+    build:
+      context: .
+    container_name: booking
+    restart: always
+    environment:
+      - SRV_PORT=${SRV_PORT}
+
+    ports:
+      - "8088:8088"
+    networks:
+      - test
+
+
+volumes:
+  pg_data:
+
+# Networks to be created to facilitate communication between containers
+networks:
+  test:
+    driver: bridge
+

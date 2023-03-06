@@ -24,7 +24,7 @@ func TestNewDaySlot(t *testing.T) {
 		wantDur int
 	}{
 		{
-			name: "check in is earlier than out",
+			name: "check if in is earlier than out",
 			args: args{
 				inSlot:  cd.Add(time.Hour * 24),
 				outSlot: cd,

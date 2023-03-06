@@ -11,15 +11,11 @@ import (
 )
 
 func main() {
-	runMainApp()
-}
-
-func runMainApp() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		<-c
-		log.Println("Goodby")
+		log.Println("Goodbye")
 		os.Exit(1)
 	}()
 
@@ -31,8 +27,23 @@ func runMainApp() {
 	router.HandleFunc("/stats", booking.StatsController(payloadExtractor, statsCalculator)).Methods("POST")
 	router.HandleFunc("/maximize", booking.MaximizeController(payloadExtractor, maximizer)).Methods("POST")
 
-	log.Println("Listen on port 8088")
+	serverAddress := configServer()
+	log.Printf("Listen on %s \n", serverAddress)
 
-	_ = http.ListenAndServe(":8088", router)
+	err := http.ListenAndServe(serverAddress, router)
+	if err != nil {
+		log.Fatal("Error in the HTTP server :" + err.Error())
+	}
+}
 
+// configServer Get the Server configuration from the Environment variable SRV_PORT
+func configServer() string {
+	defaultAddress := ":8088"
+
+	configAddress := ":" + os.Getenv("SRV_PORT")
+	if configAddress == ":" {
+		configAddress = defaultAddress
+	}
+
+	return configAddress
 }

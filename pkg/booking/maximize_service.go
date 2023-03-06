@@ -12,30 +12,37 @@ var (
 	IndexNotFoundError = errors.New("no more indexes found")
 )
 
+// Maximizer is the service interface to provide the proper service injection
 type Maximizer interface {
-	Maximize(bookings []Request) (MaximizeResponse, error)
+	Maximize(bookings []Request) MaximizeResponse
 }
 
+// Maximize is the main service object definition to calculate the Maximize booking problem
 type Maximize struct{}
 
+// NewMaximizer is the Maximize service constructor
 func NewMaximizer() *Maximize {
 	return &Maximize{}
 }
 
-func (m *Maximize) Maximize(bookings []Request) (MaximizeResponse, error) {
+// Maximize is the main method with the logic to solve the Maximize results
+func (m *Maximize) Maximize(bookings []Request) MaximizeResponse {
 	sort.Slice(bookings, func(i, j int) bool {
 		return bookings[i].StartDate().Unix() < bookings[j].StartDate().Unix()
 	})
-	// Create the tree
 
+	// Create the tree
 	rootNode := internal.NewNode(nil)
 	currentCounter := -1
 	createTree(bookings, rootNode, currentCounter)
+
 	// Get Leafs
 	leafs := rootNode.GetLeafs()
+
 	// Choose the best case
 	bestProfit, bestLeaf := getBestLeaf(leafs, rootNode)
 
+	// Calculate the result
 	var ids []string
 	curNode := bestLeaf
 	nodes := 0
@@ -65,9 +72,10 @@ func (m *Maximize) Maximize(bookings []Request) (MaximizeResponse, error) {
 		AverageNight: internal.FloatRoundPrecision(sumPPN/float32(nodes), 2),
 		MinNight:     minPPN,
 		MaxNight:     maxPPN,
-	}, nil
+	}
 }
 
+// getBestLeaf returns the best leaf with the maximum profit from the problem
 func getBestLeaf(leafs []*internal.Node, rootNode *internal.Node) (float32, *internal.Node) {
 	var bestLeaf *internal.Node
 	bestProfit := float32(0)
@@ -87,9 +95,10 @@ func getBestLeaf(leafs []*internal.Node, rootNode *internal.Node) (float32, *int
 	return bestProfit, bestLeaf
 }
 
+// createTree create the N-Tree from the bookings
 func createTree(bookings []Request, father *internal.Node, currentCounter int) {
 	var err error
-	if currentCounter < 0 {
+	if currentCounter < 0 { // The root node
 		currentCounter, err = findNodeNextToTime(0, bookings[0].StartDate(), bookings)
 	} else {
 		currentCounter, err = findNodeNextToTime(currentCounter, bookings[currentCounter].EndDate(), bookings)
@@ -98,7 +107,7 @@ func createTree(bookings []Request, father *internal.Node, currentCounter int) {
 		return // no more Nodes to add to current branch
 	}
 
-	brothers := findBrothers(currentCounter, bookings)
+	brothers := findBrothersIndexes(currentCounter, bookings)
 	brothers = append([]int{currentCounter}, brothers...)
 	for _, brother := range brothers {
 		// add node and data
@@ -106,7 +115,7 @@ func createTree(bookings []Request, father *internal.Node, currentCounter int) {
 		newFather.SetProfitPerNight(bookings[brother].ProfitPerNight)
 		newFather.SetProfit(bookings[brother].Profit)
 		newFather.SetData(bookings[brother].ID)
-		createTree(bookings, newFather, brother)
+		createTree(bookings, newFather, brother) // Recursive creation
 	}
 }
 
@@ -122,14 +131,14 @@ func findNodeNextToTime(fromPos int, fromTime time.Time, bookings []Request) (in
 	return -1, IndexNotFoundError
 }
 
-// findBrothers returns the Request indexes of different time branches than the counter => Brother in the tree
-func findBrothers(counter int, bookings []Request) []int {
-	var incompatible []int
+// findBrothersIndexes returns the Request indexes of different time branches than the counter => Brother in the tree
+func findBrothersIndexes(counter int, bookings []Request) []int {
+	var brothers []int
 	for i := counter + 1; i < len(bookings); i++ {
 		if bookings[counter].Overlaps(&bookings[i].DaySlot) && bookings[counter].StartDate().Unix() <= bookings[i].StartDate().Unix() {
-			incompatible = append(incompatible, i)
+			brothers = append(brothers, i)
 		}
 	}
 
-	return incompatible
+	return brothers
 }

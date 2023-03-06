@@ -2,6 +2,7 @@ package booking
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -16,18 +17,13 @@ func MaximizeController(
 	return func(w http.ResponseWriter, r *http.Request) {
 		bookings, err := extractor.ExtractPayload(r)
 		if err != nil {
-			log.Printf("ERROR: %s\n", err)
+			log.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, err.Error())))
 			return
 		}
 
-		retData, err := maximizer.Maximize(bookings)
-		if err != nil {
-			log.Printf("ERROR: %s\n", err)
-			w.WriteHeader(http.StatusBadRequest)
-
-			return
-		}
+		retData := maximizer.Maximize(bookings)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)

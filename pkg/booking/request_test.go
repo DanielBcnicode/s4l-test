@@ -67,6 +67,7 @@ func TestRequestFromRequestAPI(t *testing.T) {
 		args    args
 		want    Request
 		wantErr bool
+		error   error
 	}{
 		{
 			name: "Happy path in constructor",
@@ -91,6 +92,7 @@ func TestRequestFromRequestAPI(t *testing.T) {
 				),
 			},
 			wantErr: false,
+			error:   nil,
 		},
 		{
 			name: "error when data is wrong",
@@ -105,6 +107,7 @@ func TestRequestFromRequestAPI(t *testing.T) {
 			},
 			want:    Request{},
 			wantErr: true,
+			error:   ErrorDateFormatWrong,
 		},
 		{
 			name: "error when Nights is zero",
@@ -119,6 +122,7 @@ func TestRequestFromRequestAPI(t *testing.T) {
 			},
 			want:    Request{},
 			wantErr: true,
+			error:   ErrorNightsCantBeZero,
 		},
 		{
 			name: "error when SellingRate is zero",
@@ -133,12 +137,41 @@ func TestRequestFromRequestAPI(t *testing.T) {
 			},
 			want:    Request{},
 			wantErr: true,
+			error:   ErrorSellingRateCantBeZero,
+		},
+		{
+			name: "error when id is empty",
+			args: args{
+				req: RequestAPI{
+					CheckIn:     "2022-02-01",
+					Nights:      23,
+					SellingRate: 0,
+					Margin:      20,
+				},
+			},
+			want:    Request{},
+			wantErr: true,
+			error:   ErrorIDCantBeEmpty,
+		},
+		{
+			name: "error when margin is empty",
+			args: args{
+				req: RequestAPI{
+					RequestID:   "id-test",
+					CheckIn:     "2022-02-01",
+					Nights:      23,
+					SellingRate: 0,
+				},
+			},
+			want:    Request{},
+			wantErr: true,
+			error:   ErrorMarginCantBeZero,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := RequestFromRequestAPI(tt.args.req)
-			if (err != nil) != tt.wantErr {
+			if (err != nil) != tt.wantErr && err != tt.error {
 				t.Errorf("RequestFromRequestAPI() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}

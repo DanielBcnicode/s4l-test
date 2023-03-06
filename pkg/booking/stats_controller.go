@@ -3,6 +3,7 @@ package booking
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -22,8 +23,9 @@ func StatsController(
 	return func(w http.ResponseWriter, r *http.Request) {
 		bookings, err := extractor.ExtractPayload(r)
 		if err != nil {
-			log.Printf("ERROR: %s\n", err)
+			log.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte(fmt.Sprintf(`{"message":"%s"}`, err.Error())))
 			return
 		}
 

@@ -60,8 +60,7 @@ func TestMaximize_Maximize(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			m := &Maximize{}
-			got, err := m.Maximize(tt.args.bookings)
-			assert.Nil(t, err)
+			got := m.Maximize(tt.args.bookings)
 			assert.Equalf(t, tt.want, got, "Maximize(%v)", tt.args.bookings)
 		})
 	}
