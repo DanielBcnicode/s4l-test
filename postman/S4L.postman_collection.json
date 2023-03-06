@@ -1,0 +1,116 @@
+{
+	"info": {
+		"_postman_id": "f22f3d26-8585-419d-af29-bea72950dd81",
+		"name": "S4L",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Stats",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"avg_night test\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.avg_night).to.eql(8.29);",
+							"});",
+							"pm.test(\"min_night test\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.min_night).to.eql(8);",
+							"});",
+							"pm.test(\"max_night test\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.max_night).to.eql(8.58);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n{\n\"request_id\":\"bookata_XY123\",\n\"check_in\":\"2020-01-01\",\n\"nights\":5,\n\"selling_rate\":200,\n\"margin\":20\n},\n{\n\"request_id\":\"kayete_PP234\",\n\"check_in\":\"2020-01-04\",\n\"nights\":4,\n\"selling_rate\":156,\n\"margin\":22\n}\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8088/stats",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"stats"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Maximize",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"IDS test\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.request_ids).to.eql([\"bookata_XY123\",\"acme_AAAAA\"]);",
+							"});",
+							"pm.test(\"total_profit test\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.total_profit).to.eql(88);",
+							"});",
+							"pm.test(\"avg_night test\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.avg_night).to.eql(10);",
+							"});",
+							"pm.test(\"min_night test\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.min_night).to.eql(8);",
+							"});",
+							"pm.test(\"max_night test\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.max_night).to.eql(12);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n{\n\"request_id\":\"bookata_XY123\",\n\"check_in\":\"2020-01-01\",\n\"nights\":5,\n\"selling_rate\":200,\n\"margin\":20\n},\n{\n\"request_id\":\"kayete_PP234\",\n\"check_in\":\"2020-01-04\",\n\"nights\":4,\n\"selling_rate\":156,\n\"margin\":5\n},\n{\n\"request_id\":\"atropote_AA930\",\n\"check_in\":\"2020-01-04\",\n\"nights\":4,\n\"selling_rate\":150,\n\"margin\":6\n},\n{\n\"request_id\":\"acme_AAAAA\",\n\"check_in\":\"2020-01-10\",\n\"nights\":4,\n\"selling_rate\":160,\n\"margin\":30\n}\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8088/maximize",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"maximize"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
