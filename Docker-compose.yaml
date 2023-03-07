@@ -16,5 +16,6 @@ services:
 # Networks to be created to facilitate communication between containers
 networks:
   test:
+    name: test
     driver: bridge
 
